@@ -34,6 +34,20 @@ const CORES_UNIDADES = [
     'bg-yellow-500', 'bg-indigo-500', 'bg-pink-500', 'bg-teal-500', 'bg-orange-500'
 ];
 
+// FUNÇÃO CENTRAL: Verificar se um paciente está agendado baseado na coluna F
+function isPacienteAgendado(nomePaciente) {
+    if (!nomePaciente || typeof nomePaciente !== 'string') {
+        return false;
+    }
+    const nome = nomePaciente.trim().toLowerCase();
+    return nome !== '' && nome !== 'preencher';
+}
+
+// FUNÇÃO CENTRAL: Verificar se uma vaga está livre baseado na coluna F
+function isVagaLivre(nomePaciente) {
+    return !isPacienteAgendado(nomePaciente);
+}
+
 // Função para atualizar a página
 function refreshPage() {
     location.reload();
@@ -65,7 +79,7 @@ async function loadData() {
                         unidadeSaude: normalizeUnidadeSaude((values[2] || '').trim()), // Coluna C
                         dataAgendamento: (values[3] || '').trim(), // Coluna D
                         horarioAgendamento: (values[4] || '').trim(), // Coluna E
-                        nomePaciente: (values[5] || '').trim(), // Coluna F
+                        nomePaciente: (values[5] || '').trim(), // Coluna F - REFERÊNCIA PRINCIPAL
                         telefone: (values[6] || '').trim(), // Coluna G
                         prontuarioVivver: (values[7] || '').trim(), // Coluna H
                         observacaoUnidadeSaude: (values[8] || '').trim(), // Coluna I
@@ -397,14 +411,11 @@ function parseDate(dateStr) {
     return null;
 }
 
+// FUNÇÃO ATUALIZADA: updateStats - usando função central para verificar coluna F
 function updateStats() {
     const totalVagas = filteredData.length;
-    // Vagas ocupadas são aquelas que têm nome do paciente preenchido (coluna F)
-    const vagasOcupadas = filteredData.filter(item => 
-        item.nomePaciente && 
-        item.nomePaciente.trim() !== '' && 
-        item.nomePaciente.trim().toLowerCase() !== 'preencher'
-    ).length;
+    // CORREÇÃO: Usar função central para verificar pacientes agendados baseado na coluna F
+    const vagasOcupadas = filteredData.filter(item => isPacienteAgendado(item.nomePaciente)).length;
     const vagasLivres = totalVagas - vagasOcupadas;
     const taxaOcupacao = totalVagas > 0 ? (vagasOcupadas / totalVagas * 100).toFixed(1) + '%' : '0.0%';
 
@@ -423,7 +434,7 @@ function updateDashboard() {
     updateSummaryTables();
 }
 
-// FUNÇÃO CORRIGIDA: Atualizar cards de vagas por unidade
+// FUNÇÃO ATUALIZADA: updateVagasUnidadeCards - usando função central para verificar coluna F
 function updateVagasUnidadeCards() {
     const container = document.getElementById('vagasUnidadeContainer');
     if (!container) return;
@@ -431,7 +442,7 @@ function updateVagasUnidadeCards() {
     // Determinar qual dataset usar baseado nos filtros ativos
     const datasetBase = hasActiveFilters() ? filteredData : allData;
     
-    // Calcular total de vagas AGENDADAS (com nome preenchido) por unidade
+    // Calcular total de vagas AGENDADAS (usando função central baseada na coluna F) por unidade
     const vagasPorUnidade = {};
     
     // Inicializar todas as unidades com 0
@@ -439,13 +450,10 @@ function updateVagasUnidadeCards() {
         vagasPorUnidade[unidade] = 0;
     });
     
-    // Contar apenas as vagas AGENDADAS (com nome do paciente preenchido) por unidade
+    // CORREÇÃO: Contar apenas as vagas AGENDADAS usando função central
     datasetBase.forEach(item => {
         if (item.unidadeSaude && UNIDADES_SAUDE.includes(item.unidadeSaude)) {
-            // CORREÇÃO: Contar apenas se tem nome do paciente preenchido
-            if (item.nomePaciente && 
-                item.nomePaciente.trim() !== '' && 
-                item.nomePaciente.trim().toLowerCase() !== 'preencher') {
+            if (isPacienteAgendado(item.nomePaciente)) {
                 vagasPorUnidade[item.unidadeSaude]++;
             }
         }
@@ -480,6 +488,7 @@ function updateCharts() {
     updateChartProximosAgendamentosLaboratorio();
 }
 
+// FUNÇÃO ATUALIZADA: updateChartProximosAgendamentosUnidade - usando função central para verificar coluna F
 function updateChartProximosAgendamentosUnidade() {
     const proximosAgendamentosPorUnidade = {};
     const hoje = new Date();
@@ -489,11 +498,9 @@ function updateChartProximosAgendamentosUnidade() {
     
     // Para cada unidade, encontrar o próximo agendamento disponível (vaga livre)
     UNIDADES_SAUDE.forEach(unidade => {
+        // CORREÇÃO: Usar função central para verificar vagas livres baseado na coluna F
         const vagasLivresUnidade = datasetBase.filter(item => 
-            item.unidadeSaude === unidade &&
-            (!item.nomePaciente || 
-             item.nomePaciente.trim() === '' || 
-             item.nomePaciente.trim().toLowerCase() === 'preencher')
+            item.unidadeSaude === unidade && isVagaLivre(item.nomePaciente)
         );
         
         if (vagasLivresUnidade.length > 0) {
@@ -564,6 +571,7 @@ function updateChartProximosAgendamentosUnidade() {
     });
 }
 
+// FUNÇÃO ATUALIZADA: updateChartProximosAgendamentosLaboratorio - usando função central para verificar coluna F
 function updateChartProximosAgendamentosLaboratorio() {
     const proximosAgendamentosPorLab = {};
     const hoje = new Date();
@@ -573,11 +581,9 @@ function updateChartProximosAgendamentosLaboratorio() {
     
     // Para cada laboratório, encontrar o próximo agendamento disponível (vaga livre)
     LABORATORIOS_COLETA.forEach(lab => {
+        // CORREÇÃO: Usar função central para verificar vagas livres baseado na coluna F
         const vagasLivresLab = datasetBase.filter(item => 
-            item.laboratorioColeta === lab &&
-            (!item.nomePaciente || 
-             item.nomePaciente.trim() === '' || 
-             item.nomePaciente.trim().toLowerCase() === 'preencher')
+            item.laboratorioColeta === lab && isVagaLivre(item.nomePaciente)
         );
         
         if (vagasLivresLab.length > 0) {
@@ -699,17 +705,15 @@ function updateTable() {
     });
 }
 
-// FUNÇÃO CORRIGIDA: Tabelas de resumo COM TOTAIS
+// FUNÇÃO ATUALIZADA: updateSummaryTables - usando funções centrais para verificar coluna F
 function updateSummaryTables() {
     // Determinar qual dataset usar baseado nos filtros ativos
     const datasetBase = hasActiveFilters() ? filteredData : allData;
     
-    // 1. Pacientes Agendados por Dia/Unidade (apenas com nome preenchido)
+    // 1. Pacientes Agendados por Dia/Unidade (usando função central baseada na coluna F)
     const pacientesDiaUnidade = {};
     datasetBase.forEach(item => {
-        if (item.dataAgendamento && item.unidadeSaude && 
-            item.nomePaciente && item.nomePaciente.trim() !== '' && 
-            item.nomePaciente.trim().toLowerCase() !== 'preencher') {
+        if (item.dataAgendamento && item.unidadeSaude && isPacienteAgendado(item.nomePaciente)) {
             const key = `${item.dataAgendamento} - ${item.unidadeSaude}`;
             pacientesDiaUnidade[key] = (pacientesDiaUnidade[key] || 0) + 1;
         }
@@ -717,12 +721,10 @@ function updateSummaryTables() {
     const totalPacientesDiaUnidade = updateSummaryTableWithTotal('tablePacientesDiaUnidade', Object.entries(pacientesDiaUnidade).sort((a, b) => b[1] - a[1]));
     document.getElementById('totalPacientesDiaUnidade').textContent = totalPacientesDiaUnidade;
 
-    // 2. Pacientes Agendados por Mês/Unidade (apenas com nome preenchido)
+    // 2. Pacientes Agendados por Mês/Unidade (usando função central baseada na coluna F)
     const pacientesMesUnidade = {};
     datasetBase.forEach(item => {
-        if (item.dataAgendamento && item.unidadeSaude && 
-            item.nomePaciente && item.nomePaciente.trim() !== '' && 
-            item.nomePaciente.trim().toLowerCase() !== 'preencher') {
+        if (item.dataAgendamento && item.unidadeSaude && isPacienteAgendado(item.nomePaciente)) {
             const date = parseDate(item.dataAgendamento);
             if (date) {
                 const monthYear = `${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
@@ -734,12 +736,10 @@ function updateSummaryTables() {
     const totalPacientesMesUnidade = updateSummaryTableWithTotal('tablePacientesMesUnidade', Object.entries(pacientesMesUnidade).sort((a, b) => b[1] - a[1]));
     document.getElementById('totalPacientesMesUnidade').textContent = totalPacientesMesUnidade;
 
-    // 3. Pacientes Agendados por Dia/Laboratório (apenas com nome preenchido)
+    // 3. Pacientes Agendados por Dia/Laboratório (usando função central baseada na coluna F)
     const pacientesDiaLab = {};
     datasetBase.forEach(item => {
-        if (item.dataAgendamento && item.laboratorioColeta && 
-            item.nomePaciente && item.nomePaciente.trim() !== '' && 
-            item.nomePaciente.trim().toLowerCase() !== 'preencher') {
+        if (item.dataAgendamento && item.laboratorioColeta && isPacienteAgendado(item.nomePaciente)) {
             const key = `${item.dataAgendamento} - ${item.laboratorioColeta}`;
             pacientesDiaLab[key] = (pacientesDiaLab[key] || 0) + 1;
         }
@@ -747,12 +747,10 @@ function updateSummaryTables() {
     const totalPacientesDiaLab = updateSummaryTableWithTotal('tablePacientesDiaLab', Object.entries(pacientesDiaLab).sort((a, b) => b[1] - a[1]));
     document.getElementById('totalPacientesDiaLab').textContent = totalPacientesDiaLab;
 
-    // 4. Pacientes Agendados por Mês/Laboratório (apenas com nome preenchido)
+    // 4. Pacientes Agendados por Mês/Laboratório (usando função central baseada na coluna F)
     const pacientesMesLab = {};
     datasetBase.forEach(item => {
-        if (item.dataAgendamento && item.laboratorioColeta && 
-            item.nomePaciente && item.nomePaciente.trim() !== '' && 
-            item.nomePaciente.trim().toLowerCase() !== 'preencher') {
+        if (item.dataAgendamento && item.laboratorioColeta && isPacienteAgendado(item.nomePaciente)) {
             const date = parseDate(item.dataAgendamento);
             if (date) {
                 const monthYear = `${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
@@ -764,12 +762,10 @@ function updateSummaryTables() {
     const totalPacientesMesLab = updateSummaryTableWithTotal('tablePacientesMesLab', Object.entries(pacientesMesLab).sort((a, b) => b[1] - a[1]));
     document.getElementById('totalPacientesMesLab').textContent = totalPacientesMesLab;
 
-    // 5. Vagas Livres por Dia/Unidade (sem nome preenchido)
+    // 5. Vagas Livres por Dia/Unidade (usando função central baseada na coluna F)
     const vagasLivresDiaUnidade = {};
     datasetBase.forEach(item => {
-        if (item.dataAgendamento && item.unidadeSaude && 
-            (!item.nomePaciente || item.nomePaciente.trim() === '' || 
-             item.nomePaciente.trim().toLowerCase() === 'preencher')) {
+        if (item.dataAgendamento && item.unidadeSaude && isVagaLivre(item.nomePaciente)) {
             const key = `${item.dataAgendamento} - ${item.unidadeSaude}`;
             vagasLivresDiaUnidade[key] = (vagasLivresDiaUnidade[key] || 0) + 1;
         }
@@ -777,12 +773,10 @@ function updateSummaryTables() {
     const totalVagasLivresDiaUnidade = updateSummaryTableWithTotal('tableVagasLivresDiaUnidade', Object.entries(vagasLivresDiaUnidade).sort((a, b) => b[1] - a[1]));
     document.getElementById('totalVagasLivresDiaUnidade').textContent = totalVagasLivresDiaUnidade;
 
-    // 6. Vagas Livres por Mês/Unidade (sem nome preenchido)
+    // 6. Vagas Livres por Mês/Unidade (usando função central baseada na coluna F)
     const vagasLivresMesUnidade = {};
     datasetBase.forEach(item => {
-        if (item.dataAgendamento && item.unidadeSaude && 
-            (!item.nomePaciente || item.nomePaciente.trim() === '' || 
-             item.nomePaciente.trim().toLowerCase() === 'preencher')) {
+        if (item.dataAgendamento && item.unidadeSaude && isVagaLivre(item.nomePaciente)) {
             const date = parseDate(item.dataAgendamento);
             if (date) {
                 const monthYear = `${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
@@ -794,12 +788,10 @@ function updateSummaryTables() {
     const totalVagasLivresMesUnidade = updateSummaryTableWithTotal('tableVagasLivresMesUnidade', Object.entries(vagasLivresMesUnidade).sort((a, b) => b[1] - a[1]));
     document.getElementById('totalVagasLivresMesUnidade').textContent = totalVagasLivresMesUnidade;
 
-    // 7. Vagas Livres por Dia/Laboratório (sem nome preenchido)
+    // 7. Vagas Livres por Dia/Laboratório (usando função central baseada na coluna F)
     const vagasLivresDiaLab = {};
     datasetBase.forEach(item => {
-        if (item.dataAgendamento && item.laboratorioColeta && 
-            (!item.nomePaciente || item.nomePaciente.trim() === '' || 
-             item.nomePaciente.trim().toLowerCase() === 'preencher')) {
+        if (item.dataAgendamento && item.laboratorioColeta && isVagaLivre(item.nomePaciente)) {
             const key = `${item.dataAgendamento} - ${item.laboratorioColeta}`;
             vagasLivresDiaLab[key] = (vagasLivresDiaLab[key] || 0) + 1;
         }
@@ -807,12 +799,10 @@ function updateSummaryTables() {
     const totalVagasLivresDiaLab = updateSummaryTableWithTotal('tableVagasLivresDiaLab', Object.entries(vagasLivresDiaLab).sort((a, b) => b[1] - a[1]));
     document.getElementById('totalVagasLivresDiaLab').textContent = totalVagasLivresDiaLab;
 
-    // 8. Vagas Livres por Mês/Laboratório (sem nome preenchido)
+    // 8. Vagas Livres por Mês/Laboratório (usando função central baseada na coluna F)
     const vagasLivresMesLab = {};
     datasetBase.forEach(item => {
-        if (item.dataAgendamento && item.laboratorioColeta && 
-            (!item.nomePaciente || item.nomePaciente.trim() === '' || 
-             item.nomePaciente.trim().toLowerCase() === 'preencher')) {
+        if (item.dataAgendamento && item.laboratorioColeta && isVagaLivre(item.nomePaciente)) {
             const date = parseDate(item.dataAgendamento);
             if (date) {
                 const monthYear = `${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
@@ -887,4 +877,3 @@ document.addEventListener('DOMContentLoaded', function() {
     loadData();
     setInterval(loadData, 300000); // Auto-atualização a cada 5 minutos
 });
-
