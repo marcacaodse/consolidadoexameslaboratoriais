@@ -1,349 +1,160 @@
-body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    min-height: 100vh;
-}
+/* Estilos Personalizados para o Painel do Distrito Sanitário Eldorado */
 
-/* Header com Gradiente Azul */
+/* Header Gradient */
 .header-gradient {
-    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
-    position: relative;
-    overflow: hidden;
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #06b6d4 100%);
 }
 
-.header-gradient::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="white" opacity="0.1"><polygon points="0,0 1000,0 1000,100 0,80"/></svg>');
-    background-size: cover;
-}
-
-.header-gradient > div {
-    position: relative;
-    z-index: 1;
-}
-
-/* Cards e Componentes */
-.card {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    border: 1px solid #e2e8f0;
-}
-
+/* Cards de Estatísticas */
 .stats-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e2e8f0;
-    transition: all 0.3s ease;
-}
-
-.stats-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+    @apply bg-white rounded-lg shadow-md p-6 border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow duration-200;
 }
 
 .stats-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
+    @apply w-12 h-12 rounded-full flex items-center justify-center;
 }
 
-/* Container para tabelas pequenas com barra de rolagem */
-.table-container-small {
-    position: relative;
-}
-
-.table-container-small .overflow-y-auto {
-    scrollbar-width: thin;
-    scrollbar-color: #cbd5e0 #f7fafc;
-}
-
-.table-container-small .overflow-y-auto::-webkit-scrollbar {
-    width: 6px;
-}
-
-.table-container-small .overflow-y-auto::-webkit-scrollbar-track {
-    background: #f7fafc;
-    border-radius: 3px;
-}
-
-.table-container-small .overflow-y-auto::-webkit-scrollbar-thumb {
-    background: #cbd5e0;
-    border-radius: 3px;
-}
-
-.table-container-small .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-    background: #a0aec0;
-}
-
-/* Cabeçalhos sticky para tabelas pequenas */
-.table-container-small thead th {
-    position: sticky;
-    top: 0;
-    background: white;
-    z-index: 10;
-    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
-}
-
-/* Filtros */
-.filter-select {
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    padding: 8px 12px;
-    background: white;
-    font-size: 14px;
-}
-
-.filter-input {
-    width: 100%;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    padding: 8px 12px;
-    background: white;
-    font-size: 14px;
-    transition: border-color 0.2s ease;
-}
-
-.filter-input:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-/* NOVO: Estilo para exibição dos filtros selecionados */
-.selected-filters-display {
-    min-height: 20px;
-}
-
-.selected-filters-display .inline-block {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 120px;
-}
-
-/* Select2 Customização */
-.select2-container--default .select2-selection--multiple {
-    border: 1px solid #d1d5db !important;
-    border-radius: 8px !important;
-    min-height: 40px !important;
-    padding: 4px 8px !important;
-}
-
-.select2-container--default .select2-selection--multiple:focus {
-    border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
-}
-
-.select2-container--default .select2-selection--multiple .select2-selection__choice {
-    background-color: #3b82f6 !important;
-    border: 1px solid #3b82f6 !important;
-    border-radius: 6px !important;
-    color: white !important;
-    font-size: 12px !important;
-    padding: 2px 8px !important;
-    margin: 2px !important;
-}
-
-.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-    color: white !important;
-    margin-right: 4px !important;
-}
-
-.select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
-    color: #fecaca !important;
+/* Cards Gerais */
+.card {
+    @apply bg-white rounded-lg shadow-md overflow-hidden;
 }
 
 /* Botões */
 .btn-primary {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 500;
-    font-size: 14px;
-    display: inline-flex;
-    align-items: center;
-}
-
-.btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center;
 }
 
 .btn-secondary {
-    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 500;
-    font-size: 14px;
-    display: inline-flex;
-    align-items: center;
-}
-
-.btn-secondary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(107, 114, 128, 0.4);
+    @apply bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center;
 }
 
 .btn-success {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 500;
-    font-size: 14px;
-    display: inline-flex;
-    align-items: center;
+    @apply bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center;
 }
 
-.btn-success:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+/* Filtros */
+.filter-select {
+    @apply w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
 }
 
-/* Gráficos */
-.chart-container {
-    position: relative;
-    height: 400px;
-    padding: 20px;
+.filter-input {
+    @apply w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+}
+
+.selected-filters-display {
+    max-height: 60px;
+    overflow-y: auto;
 }
 
 /* Status Indicator */
 .status-indicator {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    margin-right: 8px;
+    @apply w-3 h-3 rounded-full mr-2;
 }
 
 .status-online {
-    background-color: #10b981;
-    animation: pulse 2s infinite;
+    @apply bg-green-500;
 }
 
 .status-offline {
-    background-color: #ef4444;
+    @apply bg-red-500;
 }
 
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
+/* Container para gráficos */
+.chart-container {
+    @apply p-4;
+    height: 400px;
 }
 
-/* DataTables */
-.dataTables_wrapper {
-    padding: 20px;
+/* Container para tabelas pequenas */
+.table-container-small {
+    max-height: 300px;
 }
 
-.dataTables_filter input {
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    padding: 8px 12px;
-    margin-left: 8px;
+/* Customização do Select2 */
+.select2-container--default .select2-selection--multiple {
+    @apply border-gray-300 rounded-lg;
+    min-height: 38px;
 }
 
-/* Responsividade */
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    @apply bg-blue-100 text-blue-800 border-blue-200 rounded-full;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    @apply text-blue-600 hover:text-blue-800;
+}
+
+/* Responsividade para dispositivos móveis */
 @media (max-width: 768px) {
+    .stats-card {
+        @apply p-4;
+    }
+    
     .chart-container {
         height: 300px;
-        padding: 15px;
     }
     
     .header-gradient {
-        padding: 20px 0;
+        @apply px-4 py-6;
     }
     
     .header-gradient h1 {
-        font-size: 2rem;
+        @apply text-2xl;
     }
     
-    .stats-card {
-        padding: 16px;
-    }
-    
-    .grid {
-        gap: 16px;
-    }
-    
-    /* Mobile: Reduzir tamanho das etiquetas de filtros */
-    .selected-filters-display .inline-block {
-        max-width: 80px;
-        font-size: 10px;
+    .header-gradient p {
+        @apply text-base;
     }
 }
 
-@media print {
-    body { 
-        background: white !important; 
-        font-size: 12px;
-    }
-    .card { 
-        box-shadow: none !important; 
-        border: 1px solid #ccc;
-        break-inside: avoid;
-        margin-bottom: 20px;
-    }
-    .chart-container { 
-        height: 350px !important; 
-    }
-    .no-print { 
-        display: none !important; 
-    }
-    .header-gradient {
-        background: #1e3a8a !important;
-        -webkit-print-color-adjust: exact;
-        color-adjust: exact;
-    }
-    
-    /* Ocultar exibições de filtros na impressão */
-    .selected-filters-display {
-        display: none !important;
-    }
+/* Customização do DataTables */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+    @apply text-sm;
 }
 
-/* Container */
-.container {
-    width: 100%;
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    @apply px-3 py-1 mx-1 rounded;
 }
 
-/* Loading */
-.loading {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid #2563eb;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    @apply bg-blue-600 text-white;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+/* Animações suaves */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
 }
 
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Hover effects para os cards de unidades */
+.stats-card:hover,
+.card:hover {
+    transform: translateY(-2px);
+    transition: all 0.2s ease-in-out;
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-gray-100 rounded;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-gray-400 rounded;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-600;
+}
