@@ -423,7 +423,7 @@ function updateDashboard() {
     updateSummaryTables();
 }
 
-// NOVA FUNÇÃO: Atualizar cards de vagas por unidade
+// FUNÇÃO CORRIGIDA: Atualizar cards de vagas por unidade
 function updateVagasUnidadeCards() {
     const container = document.getElementById('vagasUnidadeContainer');
     if (!container) return;
@@ -431,7 +431,7 @@ function updateVagasUnidadeCards() {
     // Determinar qual dataset usar baseado nos filtros ativos
     const datasetBase = hasActiveFilters() ? filteredData : allData;
     
-    // Calcular total de vagas agendadas por unidade
+    // Calcular total de vagas AGENDADAS (com nome preenchido) por unidade
     const vagasPorUnidade = {};
     
     // Inicializar todas as unidades com 0
@@ -439,10 +439,15 @@ function updateVagasUnidadeCards() {
         vagasPorUnidade[unidade] = 0;
     });
     
-    // Contar todas as vagas (ocupadas + livres) por unidade
+    // Contar apenas as vagas AGENDADAS (com nome do paciente preenchido) por unidade
     datasetBase.forEach(item => {
         if (item.unidadeSaude && UNIDADES_SAUDE.includes(item.unidadeSaude)) {
-            vagasPorUnidade[item.unidadeSaude]++;
+            // CORREÇÃO: Contar apenas se tem nome do paciente preenchido
+            if (item.nomePaciente && 
+                item.nomePaciente.trim() !== '' && 
+                item.nomePaciente.trim().toLowerCase() !== 'preencher') {
+                vagasPorUnidade[item.unidadeSaude]++;
+            }
         }
     });
 
@@ -882,3 +887,4 @@ document.addEventListener('DOMContentLoaded', function() {
     loadData();
     setInterval(loadData, 300000); // Auto-atualização a cada 5 minutos
 });
+
