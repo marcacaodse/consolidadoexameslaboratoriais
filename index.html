@@ -32,7 +32,17 @@
                 <i class="fas fa-filter text-gray-600 mr-2"></i>
                 <h3 class="text-lg font-semibold text-gray-800">Filtros de Dados - Planilha Atualizada em <span id="lastUpdateDate">29/09/2025</span></h3>
             </div>
-            
+
+            <!-- Filtro Mês/Ano -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Mês/Ano:</label>
+                    <select id="mesAnoFilter" class="filter-select" multiple="multiple" style="width: 100%;">
+                        <!-- Opções serão preenchidas dinamicamente -->
+                    </select>
+                    <!-- Container para mostrar seleções -->
+                    <div id="mesAnoSelected" class="selected-filters-display mt-2"></div>
+                </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 <!-- Filtro Unidades de Saúde -->
                 <div>
@@ -52,16 +62,6 @@
                     </select>
                     <!-- Container para mostrar seleções -->
                     <div id="laboratorioColetaSelected" class="selected-filters-display mt-2"></div>
-                </div>
-
-                <!-- Filtro Mês/Ano -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Mês/Ano:</label>
-                    <select id="mesAnoFilter" class="filter-select" multiple="multiple" style="width: 100%;">
-                        <!-- Opções serão preenchidas dinamicamente -->
-                    </select>
-                    <!-- Container para mostrar seleções -->
-                    <div id="mesAnoSelected" class="selected-filters-display mt-2"></div>
                 </div>
 
                 <!-- Filtro Data -->
@@ -111,7 +111,7 @@
     <!-- Estatísticas de Vagas -->
     <div class="container mx-auto px-6 py-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-            <!-- Total de Vagas -->
+            <!-- Total de Vagas Por período -->
             <div class="stats-card">
                 <div class="flex items-center">
                     <div class="stats-icon bg-blue-500">
@@ -124,7 +124,7 @@
                 </div>
             </div>
 
-            <!-- Vagas Ocupadas -->
+            <!-- Vagas Ocupadas por Período -->
             <div class="stats-card">
                 <div class="flex items-center">
                     <div class="stats-icon bg-green-500">
@@ -137,7 +137,7 @@
                 </div>
             </div>
 
-            <!-- Vagas Livres -->
+            <!-- Vagas Livres por Período-->
             <div class="stats-card">
                 <div class="flex items-center">
                     <div class="stats-icon bg-gray-700">
@@ -150,7 +150,7 @@
                 </div>
             </div>
 
-            <!-- Taxa de Ocupação -->
+            <!-- Taxa de Ocupação por Período -->
             <div class="stats-card">
                 <div class="flex items-center">
                     <div class="stats-icon bg-purple-500">
@@ -502,3 +502,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+
