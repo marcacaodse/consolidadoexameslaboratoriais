@@ -34,6 +34,19 @@ const CORES_UNIDADES = [
     'bg-yellow-500', 'bg-indigo-500', 'bg-pink-500', 'bg-teal-500', 'bg-orange-500'
 ];
 
+// NOVO: Mapeamento de ícones específicos para cada unidade
+const ICONES_UNIDADES = {
+    'Agua Branca': 'fas fa-hospital',
+    'Jardim Bandeirantes': 'fas fa-hospital',
+    'Unidade XV': 'fas fa-hospital',
+    'Csu Eldorado': 'fas fa-hospital',
+    'Novo Eldorado': 'fas fa-hospital',
+    'Jardim Eldorado': 'fas fa-hospital',
+    'Santa Cruz': 'fas fa-hospital',
+    'Perobas': 'fas fa-tree', // Ícone específico para Perobas
+    'Parque São João': 'fas fa-leaf' // Ícone específico para Parque São João
+};
+
 // FUNÇÃO CENTRAL: Verificar se um paciente está agendado baseado na coluna F
 function isPacienteAgendado(nomePaciente) {
     if (!nomePaciente || typeof nomePaciente !== 'string') {
@@ -434,7 +447,7 @@ function updateDashboard() {
     updateSummaryTables();
 }
 
-// FUNÇÃO ATUALIZADA: updateVagasUnidadeCards - usando função central para verificar coluna F
+// FUNÇÃO ATUALIZADA: updateVagasUnidadeCards - usando função central para verificar coluna F e ícones específicos
 function updateVagasUnidadeCards() {
     const container = document.getElementById('vagasUnidadeContainer');
     if (!container) return;
@@ -459,16 +472,17 @@ function updateVagasUnidadeCards() {
         }
     });
 
-    // Gerar HTML dos cards
+    // Gerar HTML dos cards com ícones específicos
     const cardsHTML = UNIDADES_SAUDE.map((unidade, index) => {
         const total = vagasPorUnidade[unidade] || 0;
         const cor = CORES_UNIDADES[index % CORES_UNIDADES.length];
+        const icone = ICONES_UNIDADES[unidade] || 'fas fa-hospital'; // Usar ícone específico ou padrão
         
         return `
             <div class="bg-white rounded-lg shadow-md p-4 border-l-4 border-l-teal-500 hover:shadow-lg transition-shadow duration-200">
                 <div class="flex items-center">
                     <div class="stats-icon ${cor}">
-                        <i class="fas fa-hospital text-white"></i>
+                        <i class="${icone} text-white"></i>
                     </div>
                     <div class="ml-4 flex-1">
                         <p class="text-sm font-medium text-gray-600 truncate" title="${unidade}">${unidade}</p>
