@@ -277,7 +277,36 @@
         </div>
     </div>
 
-    <!-- TABELAS: Vagas Utilizadas (COM TOTAIS) -->
+    <!-- Tabela Principal - Todos os Agendamentos (SEM NOME E TELEFONE) -->
+    <div class="container mx-auto px-6 mb-6">
+        <div class="card">
+            <div class="p-4 border-b">
+                <h3 class="text-lg font-semibold text-gray-800">
+                    <i class="fas fa-table mr-2 text-blue-500"></i>Todos os Agendamentos
+                </h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table id="agendamentosTable" class="display" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>UNIDADE DE SAÚDE</th>
+                            <th>DATA</th>
+                            <th>HORÁRIO</th>
+                            <th>Nº PRONTUÁRIO VIVVER</th>
+                            <th>OBSERVAÇÃO/ UNIDADE DE SAÚDE</th>
+                            <th>PERFIL DO PACIENTE OU TIPO DO EXAME</th>
+                            <th>LABORATÓRIO DE COLETA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dados serão inseridos via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABELAS: Vagas Utilizadas (COM TOTAIS) - MOVIDO PARA BAIXO DA TABELA PRINCIPAL -->
     <div class="container mx-auto px-6 mb-6">
         <div class="mb-4">
             <h3 class="text-xl font-semibold text-gray-800 mb-2">
@@ -402,7 +431,7 @@
         </div>
     </div>
 
-    <!-- TABELAS: Vagas Livres (COM TOTAIS) -->
+    <!-- TABELAS: Vagas Livres (COM TOTAIS) - MOVIDO PARA BAIXO DAS VAGAS UTILIZADAS -->
     <div class="container mx-auto px-6 mb-6">
         <div class="mb-4">
             <h3 class="text-xl font-semibold text-gray-800 mb-2">
@@ -521,35 +550,6 @@
                         </table>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tabela Principal - Todos os Agendamentos (SEM NOME E TELEFONE) -->
-    <div class="container mx-auto px-6 mb-6">
-        <div class="card">
-            <div class="p-4 border-b">
-                <h3 class="text-lg font-semibold text-gray-800">
-                    <i class="fas fa-table mr-2 text-blue-500"></i>Todos os Agendamentos
-                </h3>
-            </div>
-            <div class="overflow-x-auto">
-                <table id="agendamentosTable" class="display" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>UNIDADE DE SAÚDE</th>
-                            <th>DATA</th>
-                            <th>HORÁRIO</th>
-                            <th>Nº PRONTUÁRIO VIVVER</th>
-                            <th>OBSERVAÇÃO/ UNIDADE DE SAÚDE</th>
-                            <th>PERFIL DO PACIENTE OU TIPO DO EXAME</th>
-                            <th>LABORATÓRIO DE COLETA</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Dados serão inseridos via JavaScript -->
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>
