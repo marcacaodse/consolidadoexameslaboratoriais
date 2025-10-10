@@ -28,13 +28,19 @@ const LABORATORIO_POR_UNIDADE = {
     'Santa Cruz': 'Eldorado'
 };
 
-// Cores para os cards das unidades
+// Cores para os cards das unidades (agendadas)
 const CORES_UNIDADES = [
     'bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-red-500', 
     'bg-yellow-500', 'bg-indigo-500', 'bg-pink-500', 'bg-teal-500', 'bg-orange-500'
 ];
 
-// NOVO: Mapeamento de ícones específicos para cada unidade
+// NOVO: Cores específicas para os cards de vagas livres
+const CORES_VAGAS_LIVRES = [
+    'bg-emerald-500', 'bg-cyan-500', 'bg-lime-500', 'bg-amber-500', 
+    'bg-violet-500', 'bg-rose-500', 'bg-sky-500', 'bg-green-600', 'bg-blue-600'
+];
+
+// Mapeamento de ícones específicos para cada unidade
 const ICONES_UNIDADES = {
     'Agua Branca': 'fas fa-hospital',
     'Jardim Bandeirantes': 'fas fa-hospital',
@@ -441,13 +447,14 @@ function updateStats() {
 Chart.register(ChartDataLabels);
 
 function updateDashboard() {
-    updateVagasUnidadeCards(); // NOVA FUNÇÃO
+    updateVagasUnidadeCards(); // Função existente
+    updateVagasLivresUnidadeCards(); // NOVA FUNÇÃO
     updateCharts();
     updateTable();
     updateSummaryTables();
 }
 
-// FUNÇÃO ATUALIZADA: updateVagasUnidadeCards - usando função central para verificar coluna F e ícones específicos
+// FUNÇÃO EXISTENTE: updateVagasUnidadeCards - usando função central para verificar coluna F e ícones específicos
 function updateVagasUnidadeCards() {
     const container = document.getElementById('vagasUnidadeContainer');
     if (!container) return;
@@ -488,6 +495,56 @@ function updateVagasUnidadeCards() {
                         <p class="text-sm font-medium text-gray-600 truncate" title="${unidade}">${unidade}</p>
                         <p class="text-2xl font-bold text-gray-900">${total.toLocaleString()}</p>
                         <p class="text-xs text-gray-500">vagas agendadas</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = cardsHTML;
+}
+
+// NOVA FUNÇÃO: updateVagasLivresUnidadeCards - cards para vagas livres por unidade
+function updateVagasLivresUnidadeCards() {
+    const container = document.getElementById('vagasLivresUnidadeContainer');
+    if (!container) return;
+
+    // Determinar qual dataset usar baseado nos filtros ativos
+    const datasetBase = hasActiveFilters() ? filteredData : allData;
+    
+    // Calcular total de vagas LIVRES (usando função central baseada na coluna F) por unidade
+    const vagasLivresPorUnidade = {};
+    
+    // Inicializar todas as unidades com 0
+    UNIDADES_SAUDE.forEach(unidade => {
+        vagasLivresPorUnidade[unidade] = 0;
+    });
+    
+    // Contar apenas as vagas LIVRES usando função central
+    datasetBase.forEach(item => {
+        if (item.unidadeSaude && UNIDADES_SAUDE.includes(item.unidadeSaude)) {
+            if (isVagaLivre(item.nomePaciente)) {
+                vagasLivresPorUnidade[item.unidadeSaude]++;
+            }
+        }
+    });
+
+    // Gerar HTML dos cards com cores específicas para vagas livres e ícone de calendário
+    const cardsHTML = UNIDADES_SAUDE.map((unidade, index) => {
+        const total = vagasLivresPorUnidade[unidade] || 0;
+        const cor = CORES_VAGAS_LIVRES[index % CORES_VAGAS_LIVRES.length];
+        const icone = 'fas fa-calendar-plus'; // Ícone específico para vagas livres
+        
+        return `
+            <div class="bg-white rounded-lg shadow-md p-4 border-l-4 border-l-emerald-500 hover:shadow-lg transition-shadow duration-200">
+                <div class="flex items-center">
+                    <div class="stats-icon ${cor}">
+                        <i class="${icone} text-white"></i>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <p class="text-sm font-medium text-gray-600 truncate" title="${unidade}">${unidade}</p>
+                        <p class="text-2xl font-bold text-gray-900">${total.toLocaleString()}</p>
+                        <p class="text-xs text-gray-500">vagas livres</p>
                     </div>
                 </div>
             </div>
