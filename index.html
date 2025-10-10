@@ -228,6 +228,39 @@
         </div>
     </div>
 
+    <!-- NOVOS GRÁFICOS DE BARRAS VERTICAIS -->
+    <div class="container mx-auto px-6 mb-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Novo Gráfico 1: Total de Pacientes Agendados por Laboratório -->
+            <div class="card">
+                <div class="p-4 border-b">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                        <i class="fas fa-users mr-2 text-green-600"></i>
+                        Total de Pacientes Agendados por Laboratório de Coleta conforme o Período
+                    </h3>
+                    <p class="text-sm text-gray-600 mt-1">Quantidade de pacientes com agendamento confirmado por laboratório</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chartPacientesAgendadosLab"></canvas>
+                </div>
+            </div>
+
+            <!-- Novo Gráfico 2: Total de Vagas Livres por Laboratório -->
+            <div class="card">
+                <div class="p-4 border-b">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                        <i class="fas fa-calendar-check mr-2 text-blue-600"></i>
+                        Total de Vagas Livres por Laboratório de Coleta conforme o Período
+                    </h3>
+                    <p class="text-sm text-gray-600 mt-1">Quantidade de vagas disponíveis para agendamento por laboratório</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chartVagasLivresLab"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- TABELAS: Vagas Utilizadas (COM TOTAIS) -->
     <div class="container mx-auto px-6 mb-6">
         <div class="mb-4">
