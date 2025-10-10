@@ -1233,5 +1233,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('dataFilter').min = '2025-11-01';
     
     loadData();
-    setInterval(loadData, 300000); // Auto-atualização a cada 5 minutos
+    setInterval(loadData, 600000); // Auto-atualização a cada 10 minutos
 });
+
