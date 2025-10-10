@@ -454,7 +454,7 @@ function updateDashboard() {
     updateSummaryTables();
 }
 
-// FUNÇÃO EXISTENTE: updateVagasUnidadeCards - usando função central para verificar coluna F e ícones específicos
+// FUNÇÃO MODIFICADA: updateVagasUnidadeCards - Perobas e Parque São João usam ícone de calendário
 function updateVagasUnidadeCards() {
     const container = document.getElementById('vagasUnidadeContainer');
     if (!container) return;
@@ -479,11 +479,18 @@ function updateVagasUnidadeCards() {
         }
     });
 
-    // Gerar HTML dos cards com ícones específicos
+    // Gerar HTML dos cards com ícones modificados conforme solicitação
     const cardsHTML = UNIDADES_SAUDE.map((unidade, index) => {
         const total = vagasPorUnidade[unidade] || 0;
         const cor = CORES_UNIDADES[index % CORES_UNIDADES.length];
-        const icone = ICONES_UNIDADES[unidade] || 'fas fa-hospital'; // Usar ícone específico ou padrão
+        
+        // MODIFICAÇÃO: Perobas e Parque São João usam ícone de calendário (que estava nas vagas livres)
+        let icone;
+        if (unidade === 'Perobas' || unidade === 'Parque São João') {
+            icone = 'fas fa-calendar-plus'; // Ícone que estava nas vagas livres
+        } else {
+            icone = ICONES_UNIDADES[unidade] || 'fas fa-hospital'; // Ícones originais para outras unidades
+        }
         
         return `
             <div class="bg-white rounded-lg shadow-md p-4 border-l-4 border-l-teal-500 hover:shadow-lg transition-shadow duration-200">
@@ -504,7 +511,7 @@ function updateVagasUnidadeCards() {
     container.innerHTML = cardsHTML;
 }
 
-// NOVA FUNÇÃO: updateVagasLivresUnidadeCards - cards para vagas livres por unidade
+// FUNÇÃO MODIFICADA: updateVagasLivresUnidadeCards - Usar ícones específicos das outras unidades
 function updateVagasLivresUnidadeCards() {
     const container = document.getElementById('vagasLivresUnidadeContainer');
     if (!container) return;
@@ -529,11 +536,20 @@ function updateVagasLivresUnidadeCards() {
         }
     });
 
-    // Gerar HTML dos cards com cores específicas para vagas livres e ícone de calendário
+    // Gerar HTML dos cards com ícones modificados conforme solicitação
     const cardsHTML = UNIDADES_SAUDE.map((unidade, index) => {
         const total = vagasLivresPorUnidade[unidade] || 0;
         const cor = CORES_VAGAS_LIVRES[index % CORES_VAGAS_LIVRES.length];
-        const icone = 'fas fa-calendar-plus'; // Ícone específico para vagas livres
+        
+        // MODIFICAÇÃO: Usar ícones específicos que estavam nas vagas agendadas
+        let icone;
+        if (unidade === 'Perobas') {
+            icone = 'fas fa-tree'; // Ícone específico do Perobas que estava nas vagas agendadas
+        } else if (unidade === 'Parque São João') {
+            icone = 'fas fa-leaf'; // Ícone específico do Parque São João que estava nas vagas agendadas
+        } else {
+            icone = 'fas fa-hospital'; // Ícones das outras unidades que estavam nas vagas agendadas
+        }
         
         return `
             <div class="bg-white rounded-lg shadow-md p-4 border-l-4 border-l-emerald-500 hover:shadow-lg transition-shadow duration-200">
