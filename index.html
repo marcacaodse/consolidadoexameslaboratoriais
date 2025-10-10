@@ -165,7 +165,7 @@
         </div>
     </div>
 
-    <!-- NOVA SEÇÃO: Total de Vagas Agendadas por Unidade -->
+    <!-- SEÇÃO: Total de Vagas Agendadas por Unidade -->
     <div class="container mx-auto px-6 mb-6">
         <div class="mb-4">
             <h3 class="text-xl font-semibold text-gray-800 mb-2">
@@ -177,6 +177,21 @@
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4" id="vagasUnidadeContainer">
             <!-- Cards das unidades serão inseridos dinamicamente via JavaScript -->
+        </div>
+    </div>
+
+    <!-- NOVA SEÇÃO: Total de Vagas Livres por Unidade -->
+    <div class="container mx-auto px-6 mb-6">
+        <div class="mb-4">
+            <h3 class="text-xl font-semibold text-gray-800 mb-2">
+                <i class="fas fa-calendar-plus mr-2 text-emerald-500"></i>
+                Total de Vagas Livres por Unidade
+            </h3>
+            <p class="text-sm text-gray-600">Quantidade total de vagas livres disponíveis em cada unidade de saúde</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4" id="vagasLivresUnidadeContainer">
+            <!-- Cards das unidades com vagas livres serão inseridos dinamicamente via JavaScript -->
         </div>
     </div>
 
@@ -502,4 +517,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
