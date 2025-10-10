@@ -559,6 +559,7 @@ function updateCharts() {
     updateChartProximosAgendamentosLaboratorio();
     updateChartPacientesAgendadosLab(); // NOVO GRÁFICO
     updateChartVagasLivresLab(); // NOVO GRÁFICO
+    updateChartVagasConcedidasTempo(); // NOVO GRÁFICO - Linha do tempo
 }
 
 // FUNÇÃO ATUALIZADA: updateChartProximosAgendamentosUnidade - usando função central para verificar coluna F
@@ -865,6 +866,115 @@ function updateChartVagasLivresLab() {
                         text: 'Total de Vagas Livres'
                     }
                 }
+            }
+        }
+    });
+}
+
+// NOVA FUNÇÃO: Gráfico de Linha do Tempo com Vagas Concedidas por Mês
+function updateChartVagasConcedidasTempo() {
+    const datasetBase = hasActiveFilters() ? filteredData : allData;
+    
+    // Calcular vagas concedidas (agendadas) por mês
+    const vagasPorMes = {};
+    
+    datasetBase.forEach(item => {
+        if (item.dataAgendamento && isPacienteAgendado(item.nomePaciente)) {
+            const date = parseDate(item.dataAgendamento);
+            if (date) {
+                const monthYear = `${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+                vagasPorMes[monthYear] = (vagasPorMes[monthYear] || 0) + 1;
+            }
+        }
+    });
+
+    // Ordenar os meses cronologicamente
+    const mesesOrdenados = Object.keys(vagasPorMes).sort((a, b) => {
+        const [mesA, anoA] = a.split('/').map(Number);
+        const [mesB, anoB] = b.split('/').map(Number);
+        
+        if (anoA !== anoB) return anoA - anoB;
+        return mesA - mesB;
+    });
+
+    // Preparar dados para o gráfico
+    const labels = mesesOrdenados.map(mesAno => {
+        const [mes, ano] = mesAno.split('/');
+        const nomes = ['', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 
+                       'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+        return `${nomes[parseInt(mes)]}/${ano}`;
+    });
+    
+    const dados = mesesOrdenados.map(mesAno => vagasPorMes[mesAno] || 0);
+
+    const ctx = document.getElementById('chartVagasConcedidasTempo').getContext('2d');
+    if (charts.vagasConcedidasTempo) charts.vagasConcedidasTempo.destroy();
+
+    charts.vagasConcedidasTempo = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Vagas Concedidas',
+                data: dados,
+                borderColor: '#7c3aed', // Roxo
+                backgroundColor: 'rgba(124, 58, 237, 0.1)', // Roxo com transparência
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4, // Suavizar a linha
+                pointBackgroundColor: '#7c3aed',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { 
+                    display: true,
+                    position: 'top'
+                },
+                datalabels: {
+                    color: '#7c3aed',
+                    font: { weight: 'bold', size: 12 },
+                    anchor: 'end',
+                    align: 'top',
+                    formatter: (value) => value > 0 ? value.toString() : ''
+                }
+            },
+            scales: {
+                x: { 
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Período (Mês/Ano)'
+                    },
+                    grid: {
+                        display: true,
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                y: { 
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Quantidade de Vagas Concedidas'
+                    },
+                    grid: {
+                        display: true,
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    },
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
             }
         }
     });
