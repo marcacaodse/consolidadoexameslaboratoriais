@@ -559,7 +559,7 @@ function updateCharts() {
     updateChartProximosAgendamentosLaboratorio();
     updateChartPacientesAgendadosLab(); // NOVO GRÁFICO
     updateChartVagasLivresLab(); // NOVO GRÁFICO
-    updateChartVagasConcedidasTempo(); // NOVO GRÁFICO - Linha do tempo
+    updateChartVagasConcedidasTempo(); // GRÁFICO CORRIGIDO - Total de vagas por mês
 }
 
 // FUNÇÃO ATUALIZADA: updateChartProximosAgendamentosUnidade - usando função central para verificar coluna F
@@ -871,18 +871,19 @@ function updateChartVagasLivresLab() {
     });
 }
 
-// NOVA FUNÇÃO: Gráfico de Linha do Tempo com Vagas Concedidas por Mês
+// FUNÇÃO CORRIGIDA: Gráfico de Linha do Tempo com TOTAL DE VAGAS por Mês (agendadas + livres)
 function updateChartVagasConcedidasTempo() {
     const datasetBase = hasActiveFilters() ? filteredData : allData;
     
-    // Calcular vagas concedidas (agendadas) por mês
+    // CORREÇÃO: Calcular TOTAL DE VAGAS por mês (independente se agendadas ou livres)
     const vagasPorMes = {};
     
     datasetBase.forEach(item => {
-        if (item.dataAgendamento && isPacienteAgendado(item.nomePaciente)) {
+        if (item.dataAgendamento) {
             const date = parseDate(item.dataAgendamento);
             if (date) {
                 const monthYear = `${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+                // CORREÇÃO: Contar TODAS as vagas (agendadas + livres)
                 vagasPorMes[monthYear] = (vagasPorMes[monthYear] || 0) + 1;
             }
         }
@@ -915,18 +916,18 @@ function updateChartVagasConcedidasTempo() {
         data: {
             labels: labels,
             datasets: [{
-                label: 'Vagas Concedidas',
+                label: 'Total de Vagas Disponibilizadas',
                 data: dados,
-                borderColor: '#7c3aed', // Roxo
-                backgroundColor: 'rgba(124, 58, 237, 0.1)', // Roxo com transparência
+                borderColor: '#f97316', // Laranja (cor similar à imagem)
+                backgroundColor: 'rgba(249, 115, 22, 0.2)', // Laranja com transparência
                 borderWidth: 3,
                 fill: true,
-                tension: 0.4, // Suavizar a linha
-                pointBackgroundColor: '#7c3aed',
+                tension: 0.4, // Suavizar a linha (similar à imagem)
+                pointBackgroundColor: '#f97316',
                 pointBorderColor: '#ffffff',
                 pointBorderWidth: 2,
-                pointRadius: 6,
-                pointHoverRadius: 8
+                pointRadius: 5,
+                pointHoverRadius: 7
             }]
         },
         options: {
@@ -938,8 +939,8 @@ function updateChartVagasConcedidasTempo() {
                     position: 'top'
                 },
                 datalabels: {
-                    color: '#7c3aed',
-                    font: { weight: 'bold', size: 12 },
+                    color: '#f97316',
+                    font: { weight: 'bold', size: 11 },
                     anchor: 'end',
                     align: 'top',
                     formatter: (value) => value > 0 ? value.toString() : ''
@@ -950,31 +951,45 @@ function updateChartVagasConcedidasTempo() {
                     display: true,
                     title: {
                         display: true,
-                        text: 'Período (Mês/Ano)'
+                        text: 'Período (Mês/Ano)',
+                        font: { size: 12 }
                     },
                     grid: {
                         display: true,
-                        color: 'rgba(0, 0, 0, 0.1)'
+                        color: 'rgba(0, 0, 0, 0.1)',
+                        lineWidth: 1
+                    },
+                    ticks: {
+                        maxRotation: 45,
+                        font: { size: 10 }
                     }
                 },
                 y: { 
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Quantidade de Vagas Concedidas'
+                        text: 'Quantidade Total de Vagas',
+                        font: { size: 12 }
                     },
                     grid: {
                         display: true,
-                        color: 'rgba(0, 0, 0, 0.1)'
+                        color: 'rgba(0, 0, 0, 0.1)',
+                        lineWidth: 1
                     },
                     ticks: {
-                        stepSize: 1
+                        stepSize: 1,
+                        font: { size: 10 }
                     }
                 }
             },
             interaction: {
                 intersect: false,
                 mode: 'index'
+            },
+            elements: {
+                line: {
+                    tension: 0.4 // Linha suave como na imagem
+                }
             }
         }
     });
