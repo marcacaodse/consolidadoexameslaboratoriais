@@ -557,6 +557,8 @@ function updateVagasLivresUnidadeCards() {
 function updateCharts() {
     updateChartProximosAgendamentosUnidade();
     updateChartProximosAgendamentosLaboratorio();
+    updateChartPacientesAgendadosLab(); // NOVO GRÁFICO
+    updateChartVagasLivresLab(); // NOVO GRÁFICO
 }
 
 // FUNÇÃO ATUALIZADA: updateChartProximosAgendamentosUnidade - usando função central para verificar coluna F
@@ -717,6 +719,150 @@ function updateChartProximosAgendamentosLaboratorio() {
                     title: {
                         display: true,
                         text: 'Laboratórios de Coleta'
+                    }
+                }
+            }
+        }
+    });
+}
+
+// NOVA FUNÇÃO: Gráfico de Pacientes Agendados por Laboratório (Barras Verticais Verde Escuro)
+function updateChartPacientesAgendadosLab() {
+    const datasetBase = hasActiveFilters() ? filteredData : allData;
+    
+    // Calcular total de pacientes AGENDADOS por laboratório usando função central
+    const pacientesPorLab = {};
+    
+    // Inicializar todos os laboratórios com 0
+    LABORATORIOS_COLETA.forEach(lab => {
+        pacientesPorLab[lab] = 0;
+    });
+    
+    // Contar apenas pacientes agendados (baseado na coluna F)
+    datasetBase.forEach(item => {
+        if (item.laboratorioColeta && LABORATORIOS_COLETA.includes(item.laboratorioColeta)) {
+            if (isPacienteAgendado(item.nomePaciente)) {
+                pacientesPorLab[item.laboratorioColeta]++;
+            }
+        }
+    });
+
+    const dadosOrdenados = Object.entries(pacientesPorLab)
+        .sort((a, b) => b[1] - a[1]); // Ordem decrescente
+
+    const ctx = document.getElementById('chartPacientesAgendadosLab').getContext('2d');
+    if (charts.pacientesAgendadosLab) charts.pacientesAgendadosLab.destroy();
+
+    charts.pacientesAgendadosLab = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: dadosOrdenados.map(item => item[0]),
+            datasets: [{
+                label: 'Pacientes Agendados',
+                data: dadosOrdenados.map(item => item[1]),
+                backgroundColor: '#1f5f3f', // Verde escuro
+                borderColor: '#166f36',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                datalabels: {
+                    color: '#ffffff', // Branco
+                    font: { weight: 'bold', size: 14 },
+                    anchor: 'center',
+                    align: 'center',
+                    formatter: (value) => value.toString()
+                }
+            },
+            scales: {
+                x: { 
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Laboratórios de Coleta'
+                    }
+                },
+                y: { 
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Total de Pacientes Agendados'
+                    }
+                }
+            }
+        }
+    });
+}
+
+// NOVA FUNÇÃO: Gráfico de Vagas Livres por Laboratório (Barras Verticais Azul Escuro)
+function updateChartVagasLivresLab() {
+    const datasetBase = hasActiveFilters() ? filteredData : allData;
+    
+    // Calcular total de vagas LIVRES por laboratório usando função central
+    const vagasLivresPorLab = {};
+    
+    // Inicializar todos os laboratórios com 0
+    LABORATORIOS_COLETA.forEach(lab => {
+        vagasLivresPorLab[lab] = 0;
+    });
+    
+    // Contar apenas vagas livres (baseado na coluna F)
+    datasetBase.forEach(item => {
+        if (item.laboratorioColeta && LABORATORIOS_COLETA.includes(item.laboratorioColeta)) {
+            if (isVagaLivre(item.nomePaciente)) {
+                vagasLivresPorLab[item.laboratorioColeta]++;
+            }
+        }
+    });
+
+    const dadosOrdenados = Object.entries(vagasLivresPorLab)
+        .sort((a, b) => b[1] - a[1]); // Ordem decrescente
+
+    const ctx = document.getElementById('chartVagasLivresLab').getContext('2d');
+    if (charts.vagasLivresLab) charts.vagasLivresLab.destroy();
+
+    charts.vagasLivresLab = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: dadosOrdenados.map(item => item[0]),
+            datasets: [{
+                label: 'Vagas Livres',
+                data: dadosOrdenados.map(item => item[1]),
+                backgroundColor: '#1e3a8a', // Azul escuro
+                borderColor: '#1e40af',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                datalabels: {
+                    color: '#ffffff', // Branco
+                    font: { weight: 'bold', size: 14 },
+                    anchor: 'center',
+                    align: 'center',
+                    formatter: (value) => value.toString()
+                }
+            },
+            scales: {
+                x: { 
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Laboratórios de Coleta'
+                    }
+                },
+                y: { 
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Total de Vagas Livres'
                     }
                 }
             }
