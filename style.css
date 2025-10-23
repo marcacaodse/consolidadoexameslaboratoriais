@@ -301,7 +301,7 @@ body {
 }
 
 /* ========================================
-   CORES DOS CARDS - VAGAS AGENDADAS E LIVRES
+   CORES DOS CARDS - VAGAS AGENDADAS, LIVRES E BLOQUEADAS
    ======================================== */
 
 /* Cards com fundo AZUL CLARINHO - Vagas Agendadas */
@@ -315,14 +315,25 @@ body {
     transform: translateY(-2px);
 }
 
-/* Cards com fundo VERMELHO CLARINHO - Vagas Livres */
-.bg-light-red-card {
-    background: linear-gradient(135deg, #FFE8E8 0%, #FFD6D6 100%) !important;
-    border: 1px solid #FFBDBD;
+/* Cards com fundo VERDE CLARO - Vagas Livres (MODIFICADO) */
+.bg-light-green-card {
+    background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%) !important;
+    border: 1px solid #6EE7B7;
 }
 
-.bg-light-red-card:hover {
-    background: linear-gradient(135deg, #FFD6D6 0%, #FFC4C4 100%) !important;
+.bg-light-green-card:hover {
+    background: linear-gradient(135deg, #A7F3D0 0%, #86EFAC 100%) !important;
+    transform: translateY(-2px);
+}
+
+/* Cards com fundo AMARELO CLARO - Vagas Bloqueadas (NOVO) */
+.bg-light-yellow-card {
+    background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%) !important;
+    border: 1px solid #FCD34D;
+}
+
+.bg-light-yellow-card:hover {
+    background: linear-gradient(135deg, #FDE68A 0%, #FCD34D 100%) !important;
     transform: translateY(-2px);
 }
 
@@ -331,8 +342,12 @@ body {
     color: #1e40af !important;
 }
 
-.bg-light-red-card .text-red-700 {
-    color: #b91c1c !important;
+.bg-light-green-card .text-green-700 {
+    color: #15803d !important;
+}
+
+.bg-light-yellow-card .text-yellow-700 {
+    color: #a16207 !important;
 }
 
 /* Responsividade */
@@ -371,7 +386,8 @@ body {
     
     /* Responsividade para cards coloridos */
     .bg-light-blue-card,
-    .bg-light-red-card {
+    .bg-light-green-card,
+    .bg-light-yellow-card {
         padding: 16px !important;
     }
 }
@@ -411,8 +427,14 @@ body {
         color-adjust: exact;
     }
     
-    .bg-light-red-card {
-        background: #FFE8E8 !important;
+    .bg-light-green-card {
+        background: #D1FAE5 !important;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+    
+    .bg-light-yellow-card {
+        background: #FEF3C7 !important;
         -webkit-print-color-adjust: exact;
         color-adjust: exact;
     }
