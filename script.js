@@ -40,18 +40,55 @@ const CORES_VAGAS_LIVRES = [
     'bg-violet-500', 'bg-rose-500', 'bg-sky-500', 'bg-green-600', 'bg-blue-600'
 ];
 
-// FUNÇÃO CENTRAL: Verificar se um paciente está agendado baseado na coluna F
+// ================================
+// FUNÇÕES DE VERIFICAÇÃO (CORRIGIDAS)
+// ================================
+
+// FUNÇÃO CORRIGIDA: Verificar se um paciente está agendado
 function isPacienteAgendado(nomePaciente) {
     if (!nomePaciente || typeof nomePaciente !== 'string') {
         return false;
     }
     const nome = nomePaciente.trim().toLowerCase();
-    return nome !== '' && nome !== 'preencher';
+    
+    // CORREÇÃO: Casos especiais que devem contar como agendados
+    if (nome.includes('possui paciente agendado')) {
+        return true;
+    }
+    
+    // Verifica se NÃO é vaga livre e NÃO é vaga bloqueada
+    const isLivre = nome === '' || nome === 'preencher';
+    const isBloqueada = nome.includes('vaga bloqueada') && !nome.includes('possui paciente agendado');
+    return !isLivre && !isBloqueada;
 }
 
-// FUNÇÃO CENTRAL: Verificar se uma vaga está livre baseado na coluna F
+// FUNÇÃO ATUALIZADA: Verificar se uma vaga está livre
 function isVagaLivre(nomePaciente) {
-    return !isPacienteAgendado(nomePaciente);
+    if (!nomePaciente || typeof nomePaciente !== 'string') {
+        return true; // Vazio = vaga livre
+    }
+    const nome = nomePaciente.trim().toLowerCase();
+    // Vaga livre: vazio ou "preencher" E NÃO é bloqueada
+    const isLivre = nome === '' || nome === 'preencher';
+    const isBloqueada = nome.includes('vaga bloqueada');
+    return isLivre && !isBloqueada;
+}
+
+// FUNÇÃO CORRIGIDA: Verificar se uma vaga está bloqueada
+function isVagaBloqueada(nomePaciente) {
+    if (!nomePaciente || typeof nomePaciente !== 'string') {
+        return false;
+    }
+    const nome = nomePaciente.trim().toLowerCase();
+    
+    // CORREÇÃO: Excluir casos onde há "possui paciente agendado"
+    // Estas devem ser tratadas como pacientes agendados normais
+    if (nome.includes('possui paciente agendado')) {
+        return false;
+    }
+    
+    // Vaga bloqueada: contém "vaga bloqueada" no texto
+    return nome.includes('vaga bloqueada');
 }
 
 // Função para atualizar a página
@@ -234,6 +271,30 @@ function loadSampleData() {
             observacaoUnidadeSaude: 'Retorno',
             perfilPacienteExame: 'Exame de sangue',
             laboratorioColeta: 'Eldorado' 
+        },
+        // EXEMPLO: vaga bloqueada simples
+        { 
+            unidadeSaude: 'Perobas',
+            dataAgendamento: '15/12/2025',
+            horarioAgendamento: '7h10',
+            nomePaciente: 'VAGA BLOQUEADA/ ABERTURA NO SISTEMA VIVVER',
+            telefone: '',
+            prontuarioVivver: '',
+            observacaoUnidadeSaude: '',
+            perfilPacienteExame: '',
+            laboratorioColeta: 'Parque São João'
+        },
+        // EXEMPLO: vaga bloqueada MAS com paciente agendado (deve contar como agendada)
+        { 
+            unidadeSaude: 'Agua Branca',
+            dataAgendamento: '16/12/2025',
+            horarioAgendamento: '8h10',
+            nomePaciente: 'VAGA BLOQUEADA/ POSSUI PACIENTE AGENDADO NA OUTRA PLANILHA',
+            telefone: '',
+            prontuarioVivver: '',
+            observacaoUnidadeSaude: '',
+            perfilPacienteExame: '',
+            laboratorioColeta: 'Agua Branca'
         }
     ];
     filteredData = [...allData];
@@ -335,7 +396,7 @@ function updateFilterDisplays() {
 
     // Data
     const dataSelecionada = document.getElementById('dataFilter').value;
-    const dataTexto = dataSelecionada ? [new Date(dataSelecionada).toLocaleDateString('pt-BR')] : [];
+    const dataTexto = dataSelecionada ? [new Date(dataSelecionada + 'T00:00:00').toLocaleDateString('pt-BR')] : [];
     updateFilterDisplay('dataSelected', dataTexto, 'Data selecionada');
 
     // Horários
@@ -370,12 +431,19 @@ function updateFilterDisplay(containerId, selectedItems, labelText) {
     `;
 }
 
+// FUNÇÃO CORRIGIDA: applyFilters com comparação de data corrigida
 function applyFilters() {
     const unidadeSaudeFilter = $('#unidadeSaudeFilter').val() || [];
     const laboratorioColetaFilter = $('#laboratorioColetaFilter').val() || [];
     const mesAnoFilter = $('#mesAnoFilter').val() || [];
-    const dataFilter = document.getElementById('dataFilter').value;
+    const dataFilterValue = document.getElementById('dataFilter').value;
     const horarioFilter = $('#horarioFilter').val() || [];
+
+    // Converter a data do filtro (formato ISO YYYY-MM-DD) para objeto Date
+    let filterDate = null;
+    if (dataFilterValue) {
+        filterDate = new Date(dataFilterValue + 'T00:00:00'); // Adiciona horário para evitar problemas de timezone
+    }
 
     // FILTRAR POR DADOS REAIS (allData) APLICANDO TODOS OS FILTROS
     filteredData = allData.filter(item => {
@@ -394,11 +462,18 @@ function applyFilters() {
             }
         }
         
+        // CORREÇÃO: Comparação de data corrigida
         let inDate = true;
-        if (dataFilter) {
+        if (filterDate) {
             const itemDate = item.dataAgendamento ? parseDate(item.dataAgendamento) : null;
-            const filterDate = new Date(dataFilter);
-            inDate = itemDate && itemDate.toDateString() === filterDate.toDateString();
+            if (itemDate) {
+                // Normalizar ambas as datas para meia-noite para comparação correta
+                const itemDateNormalized = new Date(itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate());
+                const filterDateNormalized = new Date(filterDate.getFullYear(), filterDate.getMonth(), filterDate.getDate());
+                inDate = itemDateNormalized.getTime() === filterDateNormalized.getTime();
+            } else {
+                inDate = false;
+            }
         }
 
         return inUnidade && inLaboratorio && inMesAno && inDate && inHorario;
@@ -412,6 +487,7 @@ function parseDate(dateStr) {
     if (!dateStr) return null;
     const parts = dateStr.split('/');
     if (parts.length === 3) {
+        // DD/MM/YYYY
         return new Date(parts[2], parts[1] - 1, parts[0]);
     }
     return null;
@@ -422,12 +498,17 @@ function updateStats() {
     const totalVagas = filteredData.length;
     // CORREÇÃO: Usar função central para verificar pacientes agendados baseado na coluna F
     const vagasOcupadas = filteredData.filter(item => isPacienteAgendado(item.nomePaciente)).length;
-    const vagasLivres = totalVagas - vagasOcupadas;
+    const vagasBloqueadas = filteredData.filter(item => isVagaBloqueada(item.nomePaciente)).length;
+    const vagasLivres = totalVagas - vagasOcupadas - vagasBloqueadas;
     const taxaOcupacao = totalVagas > 0 ? (vagasOcupadas / totalVagas * 100).toFixed(1) + '%' : '0.0%';
 
     document.getElementById('totalVagas').textContent = totalVagas.toLocaleString();
     document.getElementById('vagasOcupadas').textContent = vagasOcupadas.toLocaleString();
     document.getElementById('vagasLivres').textContent = vagasLivres.toLocaleString();
+    // Adiciona exibição de vagas bloqueadas se existir o elemento
+    if (document.getElementById('vagasBloqueadas')) {
+        document.getElementById('vagasBloqueadas').textContent = vagasBloqueadas.toLocaleString();
+    }
     document.getElementById('taxaOcupacao').textContent = taxaOcupacao;
 }
 
@@ -436,6 +517,7 @@ Chart.register(ChartDataLabels);
 function updateDashboard() {
     updateVagasUnidadeCards();
     updateVagasLivresUnidadeCards();
+    updateVagasBloqueadasUnidadeCards();
     updateCharts();
     updateTable();
     updateSummaryTables();
@@ -484,7 +566,7 @@ function updateVagasUnidadeCards() {
     container.innerHTML = cardsHTML;
 }
 
-// FUNÇÃO MODIFICADA: updateVagasLivresUnidadeCards - Cards com fundo VERMELHO CLARINHO
+// FUNÇÃO MODIFICADA: updateVagasLivresUnidadeCards - Cards agora com fundo VERDE CLARINHO
 function updateVagasLivresUnidadeCards() {
     const container = document.getElementById('vagasLivresUnidadeContainer');
     if (!container) return;
@@ -509,15 +591,15 @@ function updateVagasLivresUnidadeCards() {
         }
     });
 
-    // Gerar HTML dos cards com FUNDO VERMELHO CLARINHO
+    // MODIFICADO: classe bg-light-green-card e cor verde
     const cardsHTML = UNIDADES_SAUDE.map((unidade, index) => {
         const total = vagasLivresPorUnidade[unidade] || 0;
         
         return `
-            <div class="bg-light-red-card rounded-lg shadow-md p-6 border-l-4 border-l-red-400 hover:shadow-lg transition-shadow duration-200">
+            <div class="bg-light-green-card rounded-lg shadow-md p-6 border-l-4 border-l-green-400 hover:shadow-lg transition-shadow duration-200">
                 <div class="text-center">
                     <p class="text-lg font-bold text-gray-800 mb-3">${unidade}</p>
-                    <p class="text-3xl font-bold text-red-700 mb-1">${total.toLocaleString()}</p>
+                    <p class="text-3xl font-bold text-green-700 mb-1">${total.toLocaleString()}</p>
                     <p class="text-sm text-gray-600">vagas livres</p>
                 </div>
             </div>
@@ -525,6 +607,29 @@ function updateVagasLivresUnidadeCards() {
     }).join('');
 
     container.innerHTML = cardsHTML;
+}
+
+// NOVA FUNÇÃO: Atualizar cards de vagas bloqueadas por unidade
+function updateVagasBloqueadasUnidadeCards() {
+    const container = document.getElementById('vagasBloqueadasUnidadeContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    UNIDADES_SAUDE.forEach(unidade => {
+        const total = filteredData.filter(item => item.unidadeSaude === unidade && isVagaBloqueada(item.nomePaciente)).length;
+        const card = document.createElement('div');
+        card.className = `
+            bg-red-100 rounded-lg shadow-md p-6 border-l-4 border-l-red-300
+            hover:shadow-lg transition-shadow duration-200
+        `;
+        card.innerHTML = `
+            <div class="text-center">
+                <p class="text-lg font-bold text-gray-800 mb-3">${unidade}</p>
+                <p class="text-3xl font-bold text-red-600 mb-1">${total.toLocaleString()}</p>
+                <p class="text-sm text-gray-600">vagas bloqueadas</p>
+            </div>
+        `;
+        container.appendChild(card);
+    });
 }
 
 function updateCharts() {
@@ -1128,6 +1233,36 @@ function updateSummaryTables() {
     });
     const totalVagasLivresMesLab = updateSummaryTableWithTotal('tableVagasLivresMesLab', Object.entries(vagasLivresMesLab).sort((a, b) => b[1] - a[1]));
     document.getElementById('totalVagasLivresMesLab').textContent = totalVagasLivresMesLab;
+
+    // 9. Vagas Bloqueadas por Dia/Unidade (usando função central baseada na coluna F)
+    const vagasBloqueadasDiaUnidade = {};
+    datasetBase.forEach(item => {
+        if (item.dataAgendamento && item.unidadeSaude && isVagaBloqueada(item.nomePaciente)) {
+            const key = `${item.dataAgendamento} - ${item.unidadeSaude}`;
+            vagasBloqueadasDiaUnidade[key] = (vagasBloqueadasDiaUnidade[key] || 0) + 1;
+        }
+    });
+    const totalVagasBloqueadasDiaUnidade = updateSummaryTableWithTotal('tableVagasBloqueadasDiaUnidade', Object.entries(vagasBloqueadasDiaUnidade).sort((a, b) => b[1] - a[1]));
+    if (document.getElementById('totalVagasBloqueadasDiaUnidade')) {
+        document.getElementById('totalVagasBloqueadasDiaUnidade').textContent = totalVagasBloqueadasDiaUnidade;
+    }
+
+    // 10. Vagas Bloqueadas por Mês/Unidade (usando função central baseada na coluna F)
+    const vagasBloqueadasMesUnidade = {};
+    datasetBase.forEach(item => {
+        if (item.dataAgendamento && item.unidadeSaude && isVagaBloqueada(item.nomePaciente)) {
+            const date = parseDate(item.dataAgendamento);
+            if (date) {
+                const monthYear = `${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+                const key = `${monthYear} - ${item.unidadeSaude}`;
+                vagasBloqueadasMesUnidade[key] = (vagasBloqueadasMesUnidade[key] || 0) + 1;
+            }
+        }
+    });
+    const totalVagasBloqueadasMesUnidade = updateSummaryTableWithTotal('tableVagasBloqueadasMesUnidade', Object.entries(vagasBloqueadasMesUnidade).sort((a, b) => b[1] - a[1]));
+    if (document.getElementById('totalVagasBloqueadasMesUnidade')) {
+        document.getElementById('totalVagasBloqueadasMesUnidade').textContent = totalVagasBloqueadasMesUnidade;
+    }
 }
 
 // Função auxiliar para verificar se há filtros ativos
@@ -1160,10 +1295,22 @@ function updateSummaryTableWithTotal(tableId, data) {
     return 0;
 }
 
+// FUNÇÃO CORRIGIDA: clearFilters agora limpa o filtro de data corretamente
 function clearFilters() {
+    // Limpar Select2 (Unidade, Laboratório, Mês/Ano, Horário)
     $('.filter-select').val(null).trigger('change');
+    
+    // Limpar campo de data
     document.getElementById('dataFilter').value = '';
-    applyFilters();
+    
+    // CORREÇÃO: Resetar para todos os dados quando limpar filtros
+    filteredData = [...allData];
+    
+    // Atualizar dashboard e estatísticas
+    updateDashboard();
+    updateStats();
+    
+    // Atualizar as exibições dos filtros
     updateFilterDisplays();
 }
 
